@@ -305,7 +305,7 @@ def main():
 
     conn = get_conn()
     cur = conn.cursor()
-    cur.execute("SELECT kode_saham FROM emiten WHERE lolos_universe = TRUE ORDER BY kode_saham")
+    cur.execute("SELECT kode_saham FROM emiten WHERE is_syariah = TRUE AND is_bank = FALSE ORDER BY kode_saham")
     universe = [r["kode_saham"] for r in cur.fetchall()]
     cur.close()
 

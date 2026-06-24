@@ -91,7 +91,7 @@ def process_file(filepath: str, trade_date: date, conn):
 
     # Ambil universe
     cur = conn.cursor()
-    cur.execute("SELECT kode_saham FROM emiten WHERE lolos_universe = TRUE")
+    cur.execute("SELECT kode_saham FROM emiten WHERE is_syariah = TRUE AND is_bank = FALSE")
     universe = {r["kode_saham"] for r in cur.fetchall()}
     cur.close()
 
