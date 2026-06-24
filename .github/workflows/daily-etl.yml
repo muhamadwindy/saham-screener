@@ -1,0 +1,70 @@
+name: Daily ETL — IDX Stock Screener
+
+on:
+  schedule:
+    # Jam 17:30 WIB = 10:30 UTC (30 menit setelah market tutup pukul 15:50 WIB)
+    - cron: "30 10 * * 1-5"   # Senin–Jumat saja
+  workflow_dispatch:          # Bisa dipicu manual dari GitHub Actions tab
+    inputs:
+      date:
+        description: "Tanggal (YYYY-MM-DD, kosongkan untuk hari ini)"
+        required: false
+        default: ""
+      skip_ohlcv:
+        description: "Skip fetch OHLCV"
+        type: boolean
+        default: false
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  etl:
+    name: Fetch, Calculate, Score
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    defaults:
+      run:
+        working-directory: etl
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Resolve tanggal
+        id: tanggal
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            echo "date=${{ github.event.inputs.date }}" >> $GITHUB_OUTPUT
+          else
+            echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 1. Fetch OHLCV (Yahoo Finance)
+        if: ${{ github.event.inputs.skip_ohlcv != 'true' }}
+        run: python fetch_ohlcv.py --days 60
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: 2. Hitung Indikator Teknikal
+        run: python calculate_indicators.py --date ${{ steps.tanggal.outputs.date }}
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: 3. Hitung Skor Komposit & Update Watchlist
+        run: python calculate_scores.py --date ${{ steps.tanggal.outputs.date }}
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Ringkasan
+        run: echo "ETL selesai untuk tanggal ${{ steps.tanggal.outputs.date }}"
