@@ -1,0 +1,64 @@
+kode_saham,nama_emiten,sektor,sub_sektor,is_syariah
+TLKM,Telkom Indonesia,Infrastruktur,Telekomunikasi,TRUE
+ASII,Astra International,Perindustrian,Otomotif,TRUE
+ICBP,Indofood CBP Sukses Makmur,Konsumen Non-Primer,Makanan,TRUE
+INDF,Indofood Sukses Makmur,Konsumen Non-Primer,Makanan,TRUE
+KLBF,Kalbe Farma,Kesehatan,Farmasi,TRUE
+SIDO,Industri Jamu & Farmasi Sido Muncul,Kesehatan,Farmasi,TRUE
+CPIN,Charoen Pokphand Indonesia,Konsumen Non-Primer,Makanan Hewan,TRUE
+MYOR,Mayora Indah,Konsumen Non-Primer,Makanan,TRUE
+JPFA,Japfa Comfeed Indonesia,Konsumen Non-Primer,Makanan Hewan,TRUE
+ANTM,Aneka Tambang,Energi,Logam & Mineral,TRUE
+ADRO,Alamtri Resources Indonesia,Energi,Batu Bara,TRUE
+PTBA,Bukit Asam,Energi,Batu Bara,TRUE
+INCO,Vale Indonesia,Energi,Logam & Mineral,TRUE
+TINS,Timah,Energi,Logam & Mineral,TRUE
+SMGR,Semen Indonesia,Perindustrian,Semen,TRUE
+INTP,Indocement Tunggal Prakarsa,Perindustrian,Semen,TRUE
+WIKA,Wijaya Karya,Perindustrian,Konstruksi & Teknik,TRUE
+PTPP,PP Persero,Perindustrian,Konstruksi & Teknik,TRUE
+WTON,Waskita Beton Precast,Perindustrian,Bahan Bangunan,TRUE
+BSDE,BSD City,Properti,Pengembang Properti,TRUE
+CTRA,Ciputra Development,Properti,Pengembang Properti,TRUE
+PWON,Pakuwon Jati,Properti,Pengembang Properti,TRUE
+SMRA,Summarecon Agung,Properti,Pengembang Properti,TRUE
+JSMR,Jasa Marga,Infrastruktur,Jalan Tol,TRUE
+EXCL,XL Axiata,Infrastruktur,Telekomunikasi,TRUE
+ISAT,Indosat,Infrastruktur,Telekomunikasi,TRUE
+EMTK,Elang Mahkota Teknologi,Media,Media Penyiaran,TRUE
+MNCN,Media Nusantara Citra,Media,Media Penyiaran,TRUE
+UNVR,Unilever Indonesia,Konsumen Primer,Perawatan Pribadi,TRUE
+HMSP,HM Sampoerna,Konsumen Primer,Rokok,FALSE
+GGRM,Gudang Garam,Konsumen Primer,Rokok,FALSE
+ITMG,Indo Tambangraya Megah,Energi,Batu Bara,TRUE
+HRUM,Harum Energy,Energi,Batu Bara,TRUE
+MDKA,Merdeka Copper Gold,Energi,Logam & Mineral,TRUE
+AMMN,Amman Mineral Internasional,Energi,Logam & Mineral,TRUE
+MEDC,Medco Energi Internasional,Energi,Minyak & Gas,TRUE
+PGEO,Pertamina Geothermal Energy,Energi,Energi Terbarukan,TRUE
+BBRI,Bank Rakyat Indonesia,Keuangan,Bank,TRUE
+BBCA,Bank Central Asia,Keuangan,Bank,TRUE
+BMRI,Bank Mandiri,Keuangan,Bank,TRUE
+BBNI,Bank Negara Indonesia,Keuangan,Bank,TRUE
+BRIS,Bank Syariah Indonesia,Keuangan,Bank Syariah,TRUE
+ACES,Ace Hardware Indonesia,Konsumen Primer,Ritel,TRUE
+MAPI,Mitra Adiperkasa,Konsumen Primer,Ritel,TRUE
+LPPF,Matahari Department Store,Konsumen Primer,Ritel,TRUE
+AMRT,Sumber Alfaria Trijaya,Konsumen Primer,Ritel,TRUE
+HERO,Hero Supermarket,Konsumen Primer,Ritel,TRUE
+FAST,Fast Food Indonesia,Konsumen Primer,Restoran,TRUE
+MIKA,Mitra Keluarga Karyasehat,Kesehatan,Rumah Sakit,TRUE
+HEAL,Medikaloka Hermina,Kesehatan,Rumah Sakit,TRUE
+SILO,Siloam International Hospitals,Kesehatan,Rumah Sakit,TRUE
+PRDA,Prodia Widyahusada,Kesehatan,Laboratorium,TRUE
+TCPI,Transcoal Pacific,Energi,Batu Bara,TRUE
+BELL,Trisula International,Konsumen Primer,Tekstil,TRUE
+RALS,Ramayana Lestari Sentosa,Konsumen Primer,Ritel,TRUE
+AALI,Astra Agro Lestari,Pertanian,Perkebunan,TRUE
+LSIP,PP London Sumatra,Pertanian,Perkebunan,TRUE
+SGRO,Sampoerna Agro,Pertanian,Perkebunan,TRUE
+DSNG,Dharma Satya Nusantara,Pertanian,Perkebunan,TRUE
+TBIG,Tower Bersama Infrastructure,Infrastruktur,Menara Telekomunikasi,TRUE
+TOWR,Sarana Menara Nusantara,Infrastruktur,Menara Telekomunikasi,TRUE
+PGAS,Perusahaan Gas Negara,Infrastruktur,Gas,TRUE
+AKRA,AKR Corporindo,Energi,Distribusi Energi,TRUE
