@@ -50,7 +50,13 @@ def compute_fundamental_score(kode: str, conn) -> float | None:
         return None
 
     def to_f(v):
-        return float(v) if v is not None else None
+        if v is None:
+            return None
+        try:
+            f = float(v)
+            return None if f != f else f  # reject NaN
+        except (TypeError, ValueError):
+            return None
 
     def pct(a, b):
         if a is None or b is None or b == 0:
