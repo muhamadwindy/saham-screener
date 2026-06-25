@@ -246,7 +246,8 @@ export async function getFlowBandar(
   horizon: Horizon
 ): Promise<FlowBandarSummary> {
   const windowDays = horizon === "harian" ? 5 : horizon === "3hari" ? 10 : 20;
-  const cutoff = sql`CURRENT_DATE - INTERVAL '${sql.raw(String(windowDays * 2))} days'`;
+  const daysBack = windowDays * 2; // 10 | 20 | 40 — fixed integer, safe to interpolate
+  const cutoff = sql`CURRENT_DATE - (${daysBack}::int * INTERVAL '1 day')`;
 
   // Broker akumulasi
   const brokerRows = await db
@@ -263,7 +264,7 @@ export async function getFlowBandar(
       and(
         eq(broker_summary_harian.kode_saham, kode),
         gte(broker_summary_harian.tanggal, cutoff as unknown as string),
-        gt(broker_summary_harian.net_buy_value, sql`0`)
+        gt(broker_summary_harian.net_buy_value, "0")
       )
     )
     .groupBy(broker.kode_broker, broker.nama_broker, broker.kategori)

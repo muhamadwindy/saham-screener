@@ -6,7 +6,7 @@ import {
   broker_summary_harian,
   watchlist,
 } from "../schema";
-import { eq, and, gte, sql, isNotNull } from "drizzle-orm";
+import { eq, and, gte, sql, isNotNull, gt, exists } from "drizzle-orm";
 import type { ImportRow, ImportResult } from "@/types";
 
 const BANK_KUSTODIAN_KEYWORDS = [
@@ -132,25 +132,45 @@ export async function importPemegangSaham(
   }
 
   // Auto-insert High Confidence watchlist
-  await db.execute(sql`
-    INSERT INTO watchlist (kode_saham, tanggal, tingkat, kode_broker_trigger, keterangan)
-    SELECT DISTINCT
-      p.kode_saham,
-      CURRENT_DATE,
-      'high_confidence',
-      p.kode_broker_terdeteksi,
-      'Broker ' || p.kode_broker_terdeteksi || ' terdeteksi sebagai pemegang >5% (import manual)'
-    FROM pemegang_saham_5_persen p
-    WHERE p.kode_broker_terdeteksi IS NOT NULL
-      AND EXISTS (
-        SELECT 1 FROM broker_summary_harian bsh
-        WHERE bsh.kode_saham = p.kode_saham
-          AND bsh.kode_broker = p.kode_broker_terdeteksi
-          AND bsh.net_buy_value > 0
-          AND bsh.tanggal >= CURRENT_DATE - INTERVAL '10 days'
+  const eligibleRows = await db
+    .selectDistinct({
+      kode_saham:  pemegang_saham_5_persen.kode_saham,
+      kode_broker: pemegang_saham_5_persen.kode_broker_terdeteksi,
+    })
+    .from(pemegang_saham_5_persen)
+    .where(
+      and(
+        isNotNull(pemegang_saham_5_persen.kode_broker_terdeteksi),
+        exists(
+          db
+            .select({ v: sql<number>`1` })
+            .from(broker_summary_harian)
+            .where(
+              and(
+                eq(broker_summary_harian.kode_saham, pemegang_saham_5_persen.kode_saham),
+                eq(broker_summary_harian.kode_broker, pemegang_saham_5_persen.kode_broker_terdeteksi!),
+                gt(broker_summary_harian.net_buy_value, "0"),
+                gte(broker_summary_harian.tanggal, sql`CURRENT_DATE - INTERVAL '10 days'`)
+              )
+            )
+        )
       )
-    ON CONFLICT DO NOTHING
-  `);
+    );
+
+  if (eligibleRows.length > 0) {
+    await db
+      .insert(watchlist)
+      .values(
+        eligibleRows.map((r) => ({
+          kode_saham:          r.kode_saham,
+          tanggal:             sql`CURRENT_DATE`,
+          tingkat:             "high_confidence" as const,
+          kode_broker_trigger: r.kode_broker,
+          keterangan:          `Broker ${r.kode_broker} terdeteksi sebagai pemegang >5% (import manual)`,
+        }))
+      )
+      .onConflictDoNothing();
+  }
 
   return {
     total_baris:    rows.length,
