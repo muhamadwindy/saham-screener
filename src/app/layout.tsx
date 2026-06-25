@@ -10,7 +10,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
+      <head>
+        {/* Prevent flash: set theme class before first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');})();`,
+          }}
+        />
+      </head>
       <body>
         <Navbar />
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">

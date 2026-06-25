@@ -24,7 +24,7 @@ async function DashboardContent({ horizon }: { horizon: Horizon }) {
       )}
       <div>
         <div className="mb-3 flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-white">Top 10 Saham</h2>
+          <h2 className="text-sm font-semibold text-slate-800 dark:text-white">Top 10 Saham</h2>
           <span className="badge-gray">Skor Komposit Tertinggi</span>
         </div>
         <TopStocksTable data={data.top_saham} horizon={horizon} />
@@ -37,13 +37,13 @@ function TableFallback() {
   return (
     <div className="card overflow-hidden animate-pulse">
       {Array.from({ length: 10 }).map((_, i) => (
-        <div key={i} className="flex gap-4 border-b border-white/5 px-4 py-4 last:border-0">
-          <div className="h-4 w-4 rounded bg-white/10" />
-          <div className="h-4 w-24 rounded bg-white/10" />
-          <div className="ml-auto h-4 w-16 rounded bg-white/10" />
-          <div className="h-4 w-12 rounded bg-white/10" />
-          <div className="h-4 w-12 rounded bg-white/10" />
-          <div className="h-4 w-12 rounded bg-white/10" />
+        <div key={i} className="flex gap-4 border-b border-slate-100 px-4 py-4 last:border-0 dark:border-white/5">
+          <div className="h-4 w-4 rounded bg-slate-200 dark:bg-white/10" />
+          <div className="h-4 w-24 rounded bg-slate-200 dark:bg-white/10" />
+          <div className="ml-auto h-4 w-16 rounded bg-slate-200 dark:bg-white/10" />
+          <div className="h-4 w-12 rounded bg-slate-200 dark:bg-white/10" />
+          <div className="h-4 w-12 rounded bg-slate-200 dark:bg-white/10" />
+          <div className="h-4 w-12 rounded bg-slate-200 dark:bg-white/10" />
         </div>
       ))}
     </div>
@@ -62,7 +62,7 @@ export default function DashboardPage({ searchParams }: PageProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="gradient-text text-2xl font-bold">IDX Stock Screener</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-gray-500">
             Saham non-bank syariah · Fundamental + Teknikal + Flow Bandar
           </p>
         </div>

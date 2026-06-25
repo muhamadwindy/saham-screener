@@ -3,7 +3,7 @@ export function RowSkeleton({ cols = 6 }: { cols?: number }) {
     <tr className="animate-pulse">
       {Array.from({ length: cols }).map((_, i) => (
         <td key={i} className="px-4 py-3">
-          <div className="h-4 rounded bg-gray-200" />
+          <div className="h-4 rounded bg-slate-200 dark:bg-gray-700" />
         </td>
       ))}
     </tr>
@@ -12,10 +12,10 @@ export function RowSkeleton({ cols = 6 }: { cols?: number }) {
 
 export function CardSkeleton({ lines = 3 }: { lines?: number }) {
   return (
-    <div className="animate-pulse rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-      <div className="mb-3 h-5 w-1/3 rounded bg-gray-200" />
+    <div className="animate-pulse rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-white/5 dark:bg-[#161b27]">
+      <div className="mb-3 h-5 w-1/3 rounded bg-slate-200 dark:bg-gray-700" />
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className={`mb-2 h-4 rounded bg-gray-100 ${i === lines - 1 ? "w-2/3" : "w-full"}`} />
+        <div key={i} className={`mb-2 h-4 rounded bg-slate-100 dark:bg-gray-800 ${i === lines - 1 ? "w-2/3" : "w-full"}`} />
       ))}
     </div>
   );

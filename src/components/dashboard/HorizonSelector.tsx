@@ -17,15 +17,15 @@ export function HorizonSelector({ current }: { current: Horizon }) {
   };
 
   return (
-    <div className="flex gap-1 rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm">
+    <div className="flex gap-1 rounded-xl border border-slate-200 bg-slate-100/80 p-1 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
       {HORIZONS.map((h) => (
         <button
           key={h}
           onClick={() => onChange(h)}
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
             h === current
-              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm shadow-emerald-500/10"
-              : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+              ? "bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 dark:shadow-emerald-500/10"
+              : "text-slate-500 hover:text-slate-800 hover:bg-white dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-white/5"
           }`}
         >
           {HORIZON_LABELS[h]}
