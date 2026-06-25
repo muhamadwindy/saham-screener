@@ -1,4 +1,4 @@
-import { formatTanggal } from "@/lib/utils/format";
+import { formatTanggalJam } from "@/lib/utils/format";
 import type { TopSahamRow, DashboardStats } from "@/types";
 
 interface Props {
@@ -93,13 +93,13 @@ export function ScoreSidebar({ topSaham, stats }: Props) {
         </h3>
         <dl className="space-y-2 text-xs">
           {[
-            { label: "Teknikal", value: formatTanggal(stats.tanggal_update_teknikal) },
-            { label: "Fundamental", value: formatTanggal(stats.tanggal_update_fundamental) },
+            { label: "Teknikal", value: formatTanggalJam(stats.tanggal_update_teknikal) },
+            { label: "Fundamental", value: formatTanggalJam(stats.tanggal_update_fundamental) },
             {
               label: "Pemegang >5%",
-              value: formatTanggal(stats.tanggal_import_pemegang_saham) === "—"
+              value: !stats.tanggal_import_pemegang_saham
                 ? "Belum diimport"
-                : formatTanggal(stats.tanggal_import_pemegang_saham),
+                : formatTanggalJam(stats.tanggal_import_pemegang_saham),
             },
           ].map(({ label, value }) => (
             <div key={label} className="flex items-center justify-between gap-2">

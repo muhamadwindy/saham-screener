@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { formatHarga, formatPersen, watchlistLabel, watchlistBadgeClass } from "@/lib/utils/format";
 import type { TopSahamRow, Horizon } from "@/types";
 
@@ -6,6 +10,8 @@ interface Props {
   data: TopSahamRow[];
   horizon: Horizon;
 }
+
+type SortKey = "skor_komposit" | "skor_fundamental" | "skor_teknikal" | "skor_flow_bandar" | "close" | "perubahan_pct";
 
 function MiniBar({ value }: { value: number | null }) {
   if (value === null) {
@@ -46,7 +52,32 @@ function KompositRing({ value }: { value: number | null }) {
   );
 }
 
+function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: "asc" | "desc" }) {
+  if (col !== sortKey) return <ChevronsUpDown className="ml-1 inline h-3 w-3 text-slate-300 dark:text-gray-700" />;
+  return sortDir === "desc"
+    ? <ChevronDown className="ml-1 inline h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+    : <ChevronUp className="ml-1 inline h-3 w-3 text-emerald-600 dark:text-emerald-400" />;
+}
+
 export function TopStocksTable({ data, horizon }: Props) {
+  const [sortKey, setSortKey] = useState<SortKey>("skor_komposit");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+    } else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+  };
+
+  const sorted = [...data].sort((a, b) => {
+    const av = (a[sortKey] as number | null) ?? -Infinity;
+    const bv = (b[sortKey] as number | null) ?? -Infinity;
+    return sortDir === "desc" ? bv - av : av - bv;
+  });
+
   if (data.length === 0) {
     return (
       <div className="card flex flex-col items-center justify-center px-6 py-16 text-center">
@@ -63,30 +94,59 @@ export function TopStocksTable({ data, horizon }: Props) {
     );
   }
 
+  const thCls = "px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500 select-none";
+  const thSortCls = `${thCls} cursor-pointer hover:text-slate-700 dark:hover:text-gray-300 transition-colors`;
+
   return (
     <div className="card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-100 dark:border-white/8">
-              <th className="w-10 px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">#</th>
-              <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Emiten</th>
-              <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Harga</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Fundamental</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Teknikal</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Flow Bandar</th>
-              <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Total</th>
-              <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Status</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-gray-500">Chart</th>
+              <th className={`w-10 ${thCls}`}>#</th>
+              <th className={`text-left ${thCls}`}>Emiten</th>
+              <th
+                className={`text-right ${thSortCls}`}
+                onClick={() => handleSort("close")}
+              >
+                Harga <SortIcon col="close" sortKey={sortKey} sortDir={sortDir} />
+              </th>
+              <th
+                className={thSortCls}
+                onClick={() => handleSort("skor_fundamental")}
+              >
+                Fundamental <SortIcon col="skor_fundamental" sortKey={sortKey} sortDir={sortDir} />
+              </th>
+              <th
+                className={thSortCls}
+                onClick={() => handleSort("skor_teknikal")}
+              >
+                Teknikal <SortIcon col="skor_teknikal" sortKey={sortKey} sortDir={sortDir} />
+              </th>
+              <th
+                className={thSortCls}
+                onClick={() => handleSort("skor_flow_bandar")}
+              >
+                Flow Bandar <SortIcon col="skor_flow_bandar" sortKey={sortKey} sortDir={sortDir} />
+              </th>
+              <th
+                className={`text-center ${thSortCls}`}
+                onClick={() => handleSort("skor_komposit")}
+              >
+                Total <SortIcon col="skor_komposit" sortKey={sortKey} sortDir={sortDir} />
+              </th>
+              <th className={`text-center ${thCls}`}>Status</th>
+              <th className={thCls}>Chart</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
-            {data.map((s, i) => {
+            {sorted.map((s, i) => {
               const isUp = s.perubahan_pct !== null && s.perubahan_pct >= 0;
+              const originalRank = data.indexOf(s);
               const rankColor =
-                i === 0 ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400" :
-                i === 1 ? "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-400" :
-                i === 2 ? "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400" :
+                originalRank === 0 ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400" :
+                originalRank === 1 ? "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-400" :
+                originalRank === 2 ? "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400" :
                 "bg-slate-50 text-slate-500 dark:bg-white/5 dark:text-gray-600";
 
               return (
@@ -94,10 +154,10 @@ export function TopStocksTable({ data, horizon }: Props) {
                   key={s.kode_saham}
                   className="group transition-colors hover:bg-slate-50/80 dark:hover:bg-white/3"
                 >
-                  {/* Rank */}
+                  {/* Rank — shows current sort position, highlight original top-3 */}
                   <td className="px-4 py-3.5">
                     <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${rankColor}`}>
-                      {i + 1}
+                      {originalRank + 1}
                     </span>
                   </td>
 
@@ -111,7 +171,7 @@ export function TopStocksTable({ data, horizon }: Props) {
                         {s.nama_emiten}
                       </div>
                       {s.sektor && (
-                        <div className="mt-0.5 text-[10px] text-slate-300 dark:text-gray-700 truncate max-w-[160px]">
+                        <div className="mt-0.5 max-w-[160px] truncate text-[10px] text-slate-300 dark:text-gray-700">
                           {s.sektor}
                         </div>
                       )}
@@ -157,7 +217,7 @@ export function TopStocksTable({ data, horizon }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                         title="Stockbit"
-                        className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-500 dark:hover:border-blue-500/40 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
+                        className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-500 dark:hover:border-emerald-500/40 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400"
                       >
                         SB
                       </a>
@@ -166,7 +226,7 @@ export function TopStocksTable({ data, horizon }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                         title="TradingView"
-                        className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-500 dark:hover:border-emerald-500/40 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400"
+                        className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-500 dark:hover:border-blue-500/40 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
                       >
                         TV
                       </a>

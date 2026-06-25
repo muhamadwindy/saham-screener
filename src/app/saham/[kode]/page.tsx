@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getSahamDetail } from "@/lib/db/queries/saham";
 import { StockDetailTabs } from "@/components/detail/StockDetailTabs";
-import { StockbitChart } from "@/components/detail/StockbitChart";
+import { LiveChart } from "@/components/detail/LiveChart";
 import { ScoreBadge } from "@/components/ui/ScoreBadge";
 import { HorizonSelector } from "@/components/dashboard/HorizonSelector";
 import { Suspense } from "react";
@@ -51,11 +51,11 @@ export default async function SahamDetailPage({
   const isUp = perubahan !== null && perubahan >= 0;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-[1680px] space-y-6">
       {/* Breadcrumb */}
       <Link
         href={`/?horizon=${horizon}`}
-        className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-slate-500 transition-colors hover:text-slate-800 dark:text-gray-500 dark:hover:text-gray-300"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Kembali ke Dashboard
@@ -67,7 +67,7 @@ export default async function SahamDetailPage({
           {/* Info kiri */}
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-black tracking-tight text-white">
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
                 {kode}
               </h1>
               {skor?.skor_komposit !== undefined && (
@@ -85,7 +85,7 @@ export default async function SahamDetailPage({
             </div>
 
             <div>
-              <p className="text-base font-medium text-gray-300">{emiten.nama_emiten}</p>
+              <p className="text-base font-medium text-slate-600 dark:text-gray-300">{emiten.nama_emiten}</p>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                 {emiten.sektor && (
                   <span className="badge-gray">{emiten.sektor}</span>
@@ -101,14 +101,14 @@ export default async function SahamDetailPage({
           </div>
 
           {/* Harga kanan */}
-          <div className="text-right space-y-1">
-            <div className="text-4xl font-black font-mono text-white">
+          <div className="space-y-1 text-right">
+            <div className="font-mono text-4xl font-black text-slate-900 dark:text-white">
               {formatHarga(lastPrice)}
             </div>
             {perubahan !== null && (
               <div
                 className={`text-lg font-bold ${
-                  isUp ? "text-emerald-400" : "text-red-400"
+                  isUp ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"
                 }`}
               >
                 {isUp ? "▲" : "▼"} {formatPersen(perubahan)}
@@ -118,13 +118,13 @@ export default async function SahamDetailPage({
         </div>
 
         {/* Skor breakdown */}
-        <div className="mt-6 grid grid-cols-3 divide-x divide-white/8 rounded-xl border border-white/8 bg-white/3">
+        <div className="mt-6 grid grid-cols-3 divide-x divide-slate-100 rounded-xl border border-slate-100 bg-slate-50 dark:divide-white/8 dark:border-white/8 dark:bg-white/3">
           {[
-            { label: "Fundamental", skor: skor?.skor_fundamental ?? null, color: "text-blue-400" },
-            { label: "Teknikal", skor: skor?.skor_teknikal ?? null, color: "text-emerald-400" },
-            { label: "Flow Bandar", skor: skor?.skor_flow_bandar ?? null, color: "text-purple-400" },
+            { label: "Fundamental", skor: skor?.skor_fundamental ?? null, color: "text-blue-600 dark:text-blue-400" },
+            { label: "Teknikal", skor: skor?.skor_teknikal ?? null, color: "text-emerald-600 dark:text-emerald-400" },
+            { label: "Flow Bandar", skor: skor?.skor_flow_bandar ?? null, color: "text-purple-600 dark:text-purple-400" },
           ].map(({ label, skor: s, color }) => (
-            <div key={label} className="flex flex-col items-center py-4 px-3 gap-1.5">
+            <div key={label} className="flex flex-col items-center gap-1.5 px-3 py-4">
               <div className={`text-xs font-semibold uppercase tracking-wider ${color}`}>
                 {label}
               </div>
@@ -136,14 +136,14 @@ export default async function SahamDetailPage({
 
       {/* Horizon selector */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-400">Horizon Analisis</span>
+        <span className="text-sm font-medium text-slate-500 dark:text-gray-400">Horizon Analisis</span>
         <Suspense>
           <HorizonSelector current={horizon} />
         </Suspense>
       </div>
 
-      {/* Live chart Stockbit */}
-      <StockbitChart kode={kode} />
+      {/* Live chart (SB / TV toggle) */}
+      <LiveChart kode={kode} />
 
       {/* Tabs detail */}
       <div className="card p-6">

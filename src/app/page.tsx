@@ -6,6 +6,7 @@ import { TopStocksTable } from "@/components/dashboard/TopStocksTable";
 import { WatchlistSection } from "@/components/dashboard/WatchlistSection";
 import { StatsBar } from "@/components/dashboard/StatsBar";
 import { ScoreSidebar } from "@/components/dashboard/ScoreSidebar";
+import { TopSahamCard } from "@/components/dashboard/TopSahamCard";
 import type { Horizon } from "@/types";
 
 const VALID_HORIZONS: Horizon[] = ["harian", "3hari", "5hari"];
@@ -21,6 +22,11 @@ async function DashboardData({ horizon }: { horizon: Horizon }) {
     <>
       {/* KPI cards */}
       <StatsBar stats={data.stats} topCount={data.top_saham.length} />
+
+      {/* Top #1 saham */}
+      {data.top_saham.length > 0 && (
+        <TopSahamCard saham={data.top_saham[0]} horizon={horizon} />
+      )}
 
       {/* Watchlist (bila ada) */}
       {data.watchlist.length > 0 && (

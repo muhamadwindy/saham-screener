@@ -45,6 +45,25 @@ export function formatTanggal(value: string | null): string {
   });
 }
 
+export function formatTanggalJam(value: string | null): string {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  const tgl = d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  });
+  const jam = d.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Jakarta",
+  });
+  return `${tgl}, ${jam} WIB`;
+}
+
 export function formatVolume(value: number | null): string {
   if (value === null) return "—";
   if (Math.abs(value) >= 1e9) return `${(value / 1e9).toFixed(1)}M lot`;
