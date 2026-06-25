@@ -5,7 +5,7 @@ import { ThemeToggle } from "./ThemeToggle";
 export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-xl dark:border-white/8 dark:bg-[#0f1117]/80">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6">
+      <nav className="mx-auto flex max-w-[1680px] items-center justify-between px-4 py-3.5 sm:px-6 xl:px-8">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 border border-emerald-200 group-hover:bg-emerald-200 transition-colors dark:bg-emerald-500/20 dark:border-emerald-500/30 dark:group-hover:bg-emerald-500/30">
             <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden />
