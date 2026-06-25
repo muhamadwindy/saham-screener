@@ -172,13 +172,22 @@ def compute_and_upsert(kode: str, df: pd.DataFrame, trade_date: date, conn):
     cur.close()
 
 
+def get_latest_ohlcv_date(conn) -> date:
+    cur = conn.cursor()
+    cur.execute("SELECT MAX(tanggal) AS d FROM ohlcv_harian")
+    row = cur.fetchone()
+    cur.close()
+    return row["d"] if row and row["d"] else date.today()
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--date", default=str(date.today()))
+    parser.add_argument("--date", default=None, help="Tanggal YYYY-MM-DD (default: tanggal OHLCV terbaru)")
     args = parser.parse_args()
-    trade_date = date.fromisoformat(args.date)
 
     conn = get_conn()
+    trade_date = date.fromisoformat(args.date) if args.date else get_latest_ohlcv_date(conn)
+
     cur = conn.cursor()
     cur.execute(
         "SELECT kode_saham FROM emiten WHERE is_syariah = TRUE AND is_bank = FALSE ORDER BY kode_saham"

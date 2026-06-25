@@ -41,30 +41,26 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Resolve tanggal
-        id: tanggal
-        run: |
-          if [ -n "${{ github.event.inputs.date }}" ]; then
-            echo "date=${{ github.event.inputs.date }}" >> $GITHUB_OUTPUT
-          else
-            echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-          fi
-
       - name: 1. Fetch OHLCV (Yahoo Finance)
         if: ${{ github.event.inputs.skip_ohlcv != 'true' }}
         run: python fetch_ohlcv.py --days 60
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
 
       - name: 2. Hitung Indikator Teknikal
-        run: python calculate_indicators.py --date ${{ steps.tanggal.outputs.date }}
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+        # Tanggal otomatis = MAX(tanggal) dari ohlcv_harian; override via --date jika manual trigger
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python calculate_indicators.py --date ${{ github.event.inputs.date }}
+          else
+            python calculate_indicators.py
+          fi
 
       - name: 3. Hitung Skor Komposit & Update Watchlist
-        run: python calculate_scores.py --date ${{ steps.tanggal.outputs.date }}
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python calculate_scores.py --date ${{ github.event.inputs.date }}
+          else
+            python calculate_scores.py
+          fi
 
       - name: Ringkasan
-        run: echo "ETL selesai untuk tanggal ${{ steps.tanggal.outputs.date }}"
+        run: echo "ETL selesai"
