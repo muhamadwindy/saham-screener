@@ -1,57 +1,66 @@
-import { Clock, Database, Users, Layers } from "lucide-react";
+import { TrendingUp, Calendar, Database, Layers } from "lucide-react";
 import { formatTanggal } from "@/lib/utils/format";
 import type { DashboardStats } from "@/types";
 
-interface StatItem {
+interface Props {
+  stats: DashboardStats;
+  topCount: number;
+}
+
+interface KpiCardProps {
   icon: React.ReactNode;
   label: string;
   value: string;
-  note?: string;
+  sub?: string;
+  accent: string;
 }
 
-export function StatsBar({ stats }: { stats: DashboardStats }) {
-  const items: StatItem[] = [
-    {
-      icon: <Clock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />,
-      label: "Teknikal & Flow",
-      value: formatTanggal(stats.tanggal_update_teknikal),
-    },
-    {
-      icon: <Database className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />,
-      label: "Fundamental",
-      value: formatTanggal(stats.tanggal_update_fundamental),
-      note: "kuartalan",
-    },
-    {
-      icon: <Users className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />,
-      label: "Pemegang >5%",
-      value:
-        formatTanggal(stats.tanggal_import_pemegang_saham) === "—"
-          ? "Belum diimport"
-          : formatTanggal(stats.tanggal_import_pemegang_saham),
-    },
-    {
-      icon: <Layers className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />,
-      label: "Universe",
-      value: `${stats.jumlah_universe} emiten`,
-    },
-  ];
-
+function KpiCard({ icon, label, value, sub, accent }: KpiCardProps) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-xs backdrop-blur-sm dark:border-white/8 dark:bg-white/4"
-        >
-          {item.icon}
-          <span className="text-slate-500 dark:text-gray-500">{item.label}:</span>
-          <span className="font-medium text-slate-800 dark:text-gray-200">{item.value}</span>
-          {item.note && (
-            <span className="text-slate-400 dark:text-gray-600">({item.note})</span>
-          )}
-        </div>
-      ))}
+    <div className="card flex items-center gap-4 px-5 py-4">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent}`}>
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs text-slate-500 dark:text-gray-500">{label}</p>
+        <p className="truncate text-lg font-bold text-slate-900 dark:text-white">{value}</p>
+        {sub && <p className="text-xs text-slate-400 dark:text-gray-600">{sub}</p>}
+      </div>
+    </div>
+  );
+}
+
+export function StatsBar({ stats, topCount }: Props) {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <KpiCard
+        icon={<Layers className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
+        accent="bg-emerald-100 dark:bg-emerald-500/15"
+        label="Universe Aktif"
+        value={`${stats.jumlah_universe} emiten`}
+        sub="Syariah non-bank"
+      />
+      <KpiCard
+        icon={<Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
+        accent="bg-blue-100 dark:bg-blue-500/15"
+        label="Update Teknikal"
+        value={formatTanggal(stats.tanggal_update_teknikal)}
+        sub="Harian otomatis"
+      />
+      <KpiCard
+        icon={<Database className="h-5 w-5 text-purple-600 dark:text-purple-400" />}
+        accent="bg-purple-100 dark:bg-purple-500/15"
+        label="Update Fundamental"
+        value={formatTanggal(stats.tanggal_update_fundamental)}
+        sub="Kuartalan"
+      />
+      <KpiCard
+        icon={<TrendingUp className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
+        accent="bg-amber-100 dark:bg-amber-500/15"
+        label="Tampil Top Saham"
+        value={`${topCount} saham`}
+        sub="Skor komposit tertinggi"
+      />
     </div>
   );
 }
