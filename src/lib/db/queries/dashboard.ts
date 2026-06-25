@@ -58,19 +58,32 @@ export async function getTopSaham(
 
   const kodeList = rows.map((r) => r.kode_saham);
 
+  // Subquery: tanggal terbaru per saham
+  const latestPerStock = db
+    .select({
+      kode_saham:   ohlcv_harian.kode_saham,
+      max_tanggal:  max(ohlcv_harian.tanggal).as("max_tanggal"),
+    })
+    .from(ohlcv_harian)
+    .where(inArray(ohlcv_harian.kode_saham, kodeList))
+    .groupBy(ohlcv_harian.kode_saham)
+    .as("latest_price");
+
   // Ambil harga terakhir + watchlist secara paralel
   const [priceRows, watchlistRows] = await Promise.all([
-    // Harga terakhir per saham (subquery via raw SQL untuk efisiensi)
-    db.execute(sql`
-      SELECT kode_saham, close::float, tanggal
-      FROM ohlcv_harian
-      WHERE (kode_saham, tanggal) IN (
-        SELECT kode_saham, MAX(tanggal)
-        FROM ohlcv_harian
-        WHERE kode_saham = ANY(${kodeList})
-        GROUP BY kode_saham
-      )
-    `),
+    db
+      .select({
+        kode_saham: ohlcv_harian.kode_saham,
+        close:      sql<number>`${ohlcv_harian.close}::float`,
+      })
+      .from(ohlcv_harian)
+      .innerJoin(
+        latestPerStock,
+        and(
+          eq(ohlcv_harian.kode_saham, latestPerStock.kode_saham),
+          eq(ohlcv_harian.tanggal,    latestPerStock.max_tanggal)
+        )
+      ),
     db
       .select({
         kode_saham: watchlist.kode_saham,
@@ -86,9 +99,8 @@ export async function getTopSaham(
       .orderBy(desc(watchlist.tanggal)),
   ]);
 
-  type PriceRow = { kode_saham: string; close: number };
   const priceMap = new Map<string, number>(
-    (priceRows.rows as PriceRow[]).map((r) => [r.kode_saham, r.close])
+    priceRows.map((r) => [r.kode_saham, r.close])
   );
   // Hanya simpan tier tertinggi per saham
   const watchlistMap = new Map<string, WatchlistTier>();
