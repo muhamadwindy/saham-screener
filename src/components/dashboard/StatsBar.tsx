@@ -45,7 +45,7 @@ export function StatsBar({ stats, topCount }: Props) {
         accent="bg-blue-100 dark:bg-blue-500/15"
         label="Update Teknikal"
         value={formatTanggal(stats.tanggal_update_teknikal)}
-        sub="Harian otomatis"
+        sub="Via tombol Update Data"
       />
       <KpiCard
         icon={<Database className="h-5 w-5 text-purple-600 dark:text-purple-400" />}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TrendingUp, Upload } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { UpdateDataButton } from "./UpdateDataButton";
 
 export function Navbar() {
   return (
@@ -35,6 +36,7 @@ export function Navbar() {
             <Upload className="h-3.5 w-3.5" aria-hidden />
             Import Data
           </Link>
+          <UpdateDataButton />
         </div>
       </nav>
     </header>
