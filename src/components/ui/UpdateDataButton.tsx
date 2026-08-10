@@ -55,10 +55,10 @@ export function UpdateDataButton() {
 
       {open && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-black/50 p-4"
           onClick={close}
         >
-          <div className="card w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
+          <div className="card my-auto w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-800 dark:text-white">
                 Update Data Screener
