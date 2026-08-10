@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getDashboard } from "@/lib/db/queries/dashboard";
 import { IHSGChart } from "@/components/dashboard/IHSGChart";
 import { HorizonSelector } from "@/components/dashboard/HorizonSelector";
-import { TopStocksTable } from "@/components/dashboard/TopStocksTable";
+import { TopStocksSection } from "@/components/dashboard/TopStocksSection";
 import { WatchlistSection } from "@/components/dashboard/WatchlistSection";
 import { StatsBar } from "@/components/dashboard/StatsBar";
 import { ScoreSidebar } from "@/components/dashboard/ScoreSidebar";
@@ -38,16 +38,7 @@ async function DashboardData({ horizon }: { horizon: Horizon }) {
         {/* Left — main content */}
         <div className="min-w-0 flex-1 space-y-4">
           <IHSGChart />
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                Top {data.top_saham.length} Saham
-              </h2>
-              <span className="badge-gray">Skor Komposit Tertinggi</span>
-              <span className="badge-gray capitalize">{horizon}</span>
-            </div>
-            <TopStocksTable data={data.top_saham} horizon={horizon} />
-          </div>
+          <TopStocksSection data={data.top_saham} horizon={horizon} />
         </div>
 
         {/* Right sidebar — sticky on xl */}

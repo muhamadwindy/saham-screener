@@ -1,19 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { formatHarga, formatPersen, watchlistLabel, watchlistBadgeClass } from "@/lib/utils/format";
+import {
+  ANALYSIS_FACTOR_ORDER,
+  ANALYSIS_FACTOR_LABELS,
+  DEFAULT_WEIGHTS,
+  computeCustomComposite,
+  type AnalysisFactor,
+} from "@/lib/scoring/weights";
 import type { TopSahamRow, Horizon } from "@/types";
 
 interface Props {
   data: TopSahamRow[];
   horizon: Horizon;
+  activeFactors: Record<AnalysisFactor, boolean>;
 }
 
-type SortKey = "skor_komposit" | "skor_fundamental" | "skor_teknikal" | "skor_flow_bandar" | "close" | "perubahan_pct";
+type SortKey = "skor_custom" | "skor_fundamental" | "skor_teknikal" | "skor_flow_bandar" | "close" | "perubahan_pct";
 
-function MiniBar({ value }: { value: number | null }) {
+const SCORE_KEY: Record<AnalysisFactor, "skor_teknikal" | "skor_flow_bandar" | "skor_fundamental"> = {
+  teknikal: "skor_teknikal",
+  flow_bandar: "skor_flow_bandar",
+  fundamental: "skor_fundamental",
+};
+
+function MiniBar({ value, dimmed }: { value: number | null; dimmed?: boolean }) {
   if (value === null) {
     return <span className="font-mono text-xs text-slate-300 dark:text-gray-700">—</span>;
   }
@@ -28,7 +42,7 @@ function MiniBar({ value }: { value: number | null }) {
     pct >= 30 ? "text-amber-700 dark:text-amber-400" : "text-red-600 dark:text-red-400";
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className={`flex items-center gap-1.5 transition-opacity ${dimmed ? "opacity-35" : ""}`}>
       <div className="h-1.5 w-14 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
         <div className={`h-full rounded-full ${fill}`} style={{ width: `${pct}%` }} />
       </div>
@@ -59,8 +73,8 @@ function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; s
     : <ChevronUp className="ml-1 inline h-3 w-3 text-emerald-600 dark:text-emerald-400" />;
 }
 
-export function TopStocksTable({ data, horizon }: Props) {
-  const [sortKey, setSortKey] = useState<SortKey>("skor_komposit");
+export function TopStocksTable({ data, horizon, activeFactors }: Props) {
+  const [sortKey, setSortKey] = useState<SortKey>("skor_custom");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const handleSort = (key: SortKey) => {
@@ -72,7 +86,24 @@ export function TopStocksTable({ data, horizon }: Props) {
     }
   };
 
-  const sorted = [...data].sort((a, b) => {
+  const weights = DEFAULT_WEIGHTS[horizon];
+  const allActive = ANALYSIS_FACTOR_ORDER.every((f) => activeFactors[f]);
+
+  // Skor komposit dihitung ulang di client dari faktor yang aktif saja
+  const withCustomScore = useMemo(
+    () =>
+      data.map((s) => ({
+        ...s,
+        skor_custom: computeCustomComposite(
+          { teknikal: s.skor_teknikal, flow_bandar: s.skor_flow_bandar, fundamental: s.skor_fundamental },
+          weights,
+          activeFactors
+        ),
+      })),
+    [data, weights, activeFactors]
+  );
+
+  const sorted = [...withCustomScore].sort((a, b) => {
     const av = (a[sortKey] as number | null) ?? -Infinity;
     const bv = (b[sortKey] as number | null) ?? -Infinity;
     return sortDir === "desc" ? bv - av : av - bv;
@@ -111,29 +142,21 @@ export function TopStocksTable({ data, horizon }: Props) {
               >
                 Harga <SortIcon col="close" sortKey={sortKey} sortDir={sortDir} />
               </th>
-              <th
-                className={thSortCls}
-                onClick={() => handleSort("skor_fundamental")}
-              >
-                Fundamental <SortIcon col="skor_fundamental" sortKey={sortKey} sortDir={sortDir} />
-              </th>
-              <th
-                className={thSortCls}
-                onClick={() => handleSort("skor_teknikal")}
-              >
-                Teknikal <SortIcon col="skor_teknikal" sortKey={sortKey} sortDir={sortDir} />
-              </th>
-              <th
-                className={thSortCls}
-                onClick={() => handleSort("skor_flow_bandar")}
-              >
-                Flow Bandar <SortIcon col="skor_flow_bandar" sortKey={sortKey} sortDir={sortDir} />
-              </th>
+              {ANALYSIS_FACTOR_ORDER.map((factor) => (
+                <th
+                  key={factor}
+                  className={`${thSortCls} ${activeFactors[factor] ? "" : "opacity-40"}`}
+                  onClick={() => handleSort(SCORE_KEY[factor])}
+                >
+                  {ANALYSIS_FACTOR_LABELS[factor]}{" "}
+                  <SortIcon col={SCORE_KEY[factor]} sortKey={sortKey} sortDir={sortDir} />
+                </th>
+              ))}
               <th
                 className={`text-center ${thSortCls}`}
-                onClick={() => handleSort("skor_komposit")}
+                onClick={() => handleSort("skor_custom")}
               >
-                Total <SortIcon col="skor_komposit" sortKey={sortKey} sortDir={sortDir} />
+                {allActive ? "Total" : "Total*"} <SortIcon col="skor_custom" sortKey={sortKey} sortDir={sortDir} />
               </th>
               <th className={`text-center ${thCls}`}>Status</th>
               <th className={thCls}>Chart</th>
@@ -142,7 +165,7 @@ export function TopStocksTable({ data, horizon }: Props) {
           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
             {sorted.map((s, i) => {
               const isUp = s.perubahan_pct !== null && s.perubahan_pct >= 0;
-              const originalRank = data.indexOf(s);
+              const originalRank = data.findIndex((d) => d.kode_saham === s.kode_saham);
               const rankColor =
                 originalRank === 0 ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400" :
                 originalRank === 1 ? "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-400" :
@@ -188,14 +211,16 @@ export function TopStocksTable({ data, horizon }: Props) {
                     </div>
                   </td>
 
-                  {/* Score bars */}
-                  <td className="px-4 py-3.5"><MiniBar value={s.skor_fundamental} /></td>
-                  <td className="px-4 py-3.5"><MiniBar value={s.skor_teknikal} /></td>
-                  <td className="px-4 py-3.5"><MiniBar value={s.skor_flow_bandar} /></td>
+                  {/* Score bars — urutan & dim mengikuti Analisa Aktif */}
+                  {ANALYSIS_FACTOR_ORDER.map((factor) => (
+                    <td key={factor} className="px-4 py-3.5">
+                      <MiniBar value={s[SCORE_KEY[factor]]} dimmed={!activeFactors[factor]} />
+                    </td>
+                  ))}
 
-                  {/* Komposit ring */}
+                  {/* Komposit ring — dihitung ulang dari faktor aktif */}
                   <td className="px-4 py-3.5 text-center">
-                    <KompositRing value={s.skor_komposit} />
+                    <KompositRing value={s.skor_custom} />
                   </td>
 
                   {/* Status */}
