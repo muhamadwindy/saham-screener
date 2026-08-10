@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart2, TrendingUp, Layers, Info } from "lucide-react";
+import { BarChart2, TrendingUp, Layers, Info, ChevronDown } from "lucide-react";
 import {
   ANALYSIS_FACTOR_ORDER,
   ANALYSIS_FACTOR_LABELS,
@@ -16,16 +16,16 @@ const ICONS: Record<AnalysisFactor, typeof TrendingUp> = {
 
 export function MethodologyInfo() {
   return (
-    <details className="card-sm group px-4 py-2.5 open:pb-4">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-slate-500 marker:content-none dark:text-gray-400">
-        <Info className="h-3.5 w-3.5" />
+    <details open className="card-sm group overflow-hidden">
+      <summary
+        className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-medium text-slate-600 marker:content-none transition-colors hover:bg-slate-50 dark:text-gray-300 dark:hover:bg-white/5"
+      >
+        <Info className="h-4 w-4 text-slate-400 dark:text-gray-500" />
         Metodologi skor — apa saja yang dihitung
-        <span className="ml-auto text-slate-300 transition-transform group-open:rotate-180 dark:text-gray-600">
-          ⌄
-        </span>
+        <ChevronDown className="ml-auto h-4 w-4 text-slate-400 transition-transform duration-200 group-open:rotate-180 dark:text-gray-500" />
       </summary>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 border-t border-slate-100 px-4 py-4 dark:border-white/8 sm:grid-cols-3">
         {ANALYSIS_FACTOR_ORDER.map((factor, i) => {
           const Icon = ICONS[factor];
           const meta = ANALYSIS_FACTOR_METHODOLOGY[factor];

@@ -165,11 +165,10 @@ export function TopStocksTable({ data, horizon, activeFactors }: Props) {
           <tbody className="divide-y divide-slate-50 dark:divide-white/5">
             {sorted.map((s, i) => {
               const isUp = s.perubahan_pct !== null && s.perubahan_pct >= 0;
-              const originalRank = data.findIndex((d) => d.kode_saham === s.kode_saham);
               const rankColor =
-                originalRank === 0 ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400" :
-                originalRank === 1 ? "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-400" :
-                originalRank === 2 ? "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400" :
+                i === 0 ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400" :
+                i === 1 ? "bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-gray-400" :
+                i === 2 ? "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-400" :
                 "bg-slate-50 text-slate-500 dark:bg-white/5 dark:text-gray-600";
 
               return (
@@ -177,10 +176,10 @@ export function TopStocksTable({ data, horizon, activeFactors }: Props) {
                   key={s.kode_saham}
                   className="group transition-colors hover:bg-slate-50/80 dark:hover:bg-white/3"
                 >
-                  {/* Rank — shows current sort position, highlight original top-3 */}
+                  {/* Rank — posisi urutan saat ini (ikut berubah saat sort kolom atau toggle Analisa Aktif) */}
                   <td className="px-4 py-3.5">
                     <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${rankColor}`}>
-                      {originalRank + 1}
+                      {i + 1}
                     </span>
                   </td>
 
